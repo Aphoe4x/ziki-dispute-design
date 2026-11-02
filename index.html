@@ -117,6 +117,27 @@
       <button class="btn" type="button">Open a dispute</button>
     </div>
 
+    <section class="card" aria-label="Credit missing awards">
+      <h2 style="margin-bottom: 8px;">Credit missing awards</h2>
+      <p class="sub" style="margin-bottom: 14px;">Solver points need a resolved or closed issue with an assignee. Reporter points are withheld on duplicates. An award that is already in the ledger is not added again.</p>
+      <form class="form" onsubmit="return false;">
+        <label>
+          Issue numbers
+          <textarea placeholder="269, 270, 10, 271, 272, 273"></textarea>
+        </label>
+        <label>
+          Award type
+          <select>
+            <option>Solver award</option>
+            <option>Reporter award</option>
+          </select>
+        </label>
+        <div class="actions">
+          <button class="btn" type="submit">Credit awards</button>
+        </div>
+      </form>
+    </section>
+
     <section aria-label="Open queue">
       <div class="section-title"><h2>Open queue</h2><span class="count">(2)</span></div>
       <div class="card dispute">
