@@ -3,104 +3,96 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ziki: Dispute section (design draft)</title>
+  <title>Ziki: Disputes (design draft)</title>
   <style>
     :root {
-      --bg: #f6f7fb;
+      --bg: #f5f7fc;
       --card: #ffffff;
-      --text: #17171c;
-      --text2: #5b6070;
-      --line: #e3e6ef;
-      --accent: #5b4bdb;
-      --accent-tint: #ecebfc;
-      --open-bg: #fff4e0;
-      --open-fg: #9a5a00;
-      --granted-bg: #e4f6ec;
-      --granted-fg: #1f7a45;
-      --rejected-bg: #eceef3;
-      --rejected-fg: #4a4f5e;
+      --text: #15121f;
+      --text2: #5d6275;
+      --line: #e2e6f0;
+      --primary: #2756b8;
+      --primary-tint: #e8eefb;
+      --warn-bg: #fff4e0;
+      --warn-fg: #9a5a00;
+      --ok-bg: #e4f6ec;
+      --ok-fg: #1f7a45;
+      --no-bg: #eceef3;
+      --no-fg: #4a4f5e;
+      --proposed-bg: #f1ecff;
+      --proposed-fg: #5b3fc4;
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
       background: var(--bg);
       color: var(--text);
       line-height: 1.5;
     }
     .draft-banner {
-      background: #17171c;
+      background: #15121f;
       color: #fff;
       text-align: center;
       font-size: 13px;
       padding: 8px 12px;
     }
-    main {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 24px 16px 48px;
-    }
-    .crumb { font-size: 13px; color: var(--text2); margin-bottom: 4px; }
-    h1 { font-size: 22px; margin: 0 0 8px; }
-    .meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 20px; }
-    .pill {
-      display: inline-block;
-      font-size: 12px;
-      font-weight: 600;
-      padding: 2px 10px;
-      border-radius: 999px;
-      background: var(--accent-tint);
-      color: var(--accent);
-    }
-    .pill.open { background: var(--open-bg); color: var(--open-fg); }
-    .pill.granted { background: var(--granted-bg); color: var(--granted-fg); }
-    .pill.rejected { background: var(--rejected-bg); color: var(--rejected-fg); }
-    .panel {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      margin-bottom: 20px;
-      overflow: hidden;
-    }
-    .panel-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-      padding: 14px 16px;
-      border-bottom: 1px solid var(--line);
-    }
-    .panel-head h2 { font-size: 16px; margin: 0; }
+    main { max-width: 960px; margin: 0 auto; padding: 24px 16px 48px; }
+    .page-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+    h1 { font-size: 22px; margin: 0; }
+    h2 { font-size: 16px; margin: 0; }
+    .sub { color: var(--text2); font-size: 14px; margin: 4px 0 0; }
     .btn {
       font: inherit;
       font-size: 14px;
-      font-weight: 600;
-      padding: 8px 14px;
-      border-radius: 8px;
-      border: 1px solid var(--accent);
-      background: var(--accent);
+      font-weight: 500;
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: 1px solid var(--primary);
+      background: var(--primary);
       color: #fff;
       cursor: pointer;
     }
-    .btn.ghost { background: #fff; color: var(--accent); }
-    .dispute { padding: 14px 16px; border-bottom: 1px solid var(--line); }
-    .dispute:last-child { border-bottom: none; }
-    .dispute-top { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 6px; }
+    .btn.ghost { background: #fff; color: var(--primary); }
+    .btn.small { font-size: 13px; padding: 6px 12px; }
+    .section-title { display: flex; align-items: center; gap: 8px; margin: 24px 0 10px; }
+    .count { color: var(--text2); font-size: 14px; font-weight: 400; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    .empty { color: var(--text2); font-size: 14px; }
+    .tag {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--primary-tint);
+      color: var(--primary);
+    }
+    .tag.proposed { background: var(--proposed-bg); color: var(--proposed-fg); }
+    .pill { display: inline-block; font-size: 12px; font-weight: 500; padding: 2px 10px; border-radius: 999px; }
+    .pill.open { background: var(--warn-bg); color: var(--warn-fg); }
+    .pill.granted { background: var(--ok-bg); color: var(--ok-fg); }
+    .pill.rejected { background: var(--no-bg); color: var(--no-fg); }
+    .row-top { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 6px; }
     .kind { font-size: 12px; color: var(--text2); }
     .dispute p { margin: 4px 0; font-size: 14px; }
     .label { color: var(--text2); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .03em; }
     .actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
-    .actions .btn { font-size: 13px; padding: 6px 12px; }
-    .form { padding: 16px; display: grid; gap: 14px; }
-    .form label { display: grid; gap: 6px; font-size: 13px; font-weight: 600; }
+    .form { display: grid; gap: 14px; }
+    .form label { display: grid; gap: 6px; font-size: 13px; font-weight: 500; }
     .form input, .form select, .form textarea {
       font: inherit;
       font-weight: 400;
       font-size: 14px;
-      padding: 9px 10px;
+      padding: 9px 12px;
       border: 1px solid var(--line);
-      border-radius: 8px;
+      border-radius: 10px;
       background: #fff;
       color: var(--text);
     }
@@ -108,157 +100,127 @@
     .hint { font-size: 12px; color: var(--text2); font-weight: 400; }
     .row { display: grid; gap: 14px; grid-template-columns: 1fr 1fr; }
     @media (max-width: 640px) { .row { grid-template-columns: 1fr; } }
-    .list-row {
-      display: grid;
-      grid-template-columns: 110px 1fr 120px;
-      gap: 12px;
-      padding: 12px 16px;
-      border-bottom: 1px solid var(--line);
-      font-size: 14px;
-      align-items: center;
-    }
-    .list-row:last-child { border-bottom: none; }
-    @media (max-width: 640px) { .list-row { grid-template-columns: 1fr; gap: 4px; } }
-    .decider { font-size: 13px; color: var(--text2); }
-    .note {
-      font-size: 13px;
-      color: var(--text2);
-      background: var(--accent-tint);
-      border-radius: 8px;
-      padding: 10px 12px;
-      margin-top: 12px;
-    }
+    .note { font-size: 13px; color: var(--text2); background: var(--primary-tint); border-radius: 10px; padding: 10px 12px; }
+    .proposed-box { border: 1px dashed #b9a8f0; background: #fbfaff; }
   </style>
 </head>
 <body>
-  <div class="draft-banner">Design draft for review. Not approved, not implemented.</div>
+  <div class="draft-banner">Design draft for review. Not approved, not implemented. Purple sections are proposed additions.</div>
 
   <main>
-    <div class="crumb">Issues / Desktop: Saved profile details disappear after reload</div>
-    <h1>Desktop: Saved profile details disappear after reload</h1>
-    <div class="meta">
-      <span class="pill">Done</span>
-      <span class="pill">Accepted</span>
-      <span class="kind">Reported by Agent A · Owner: Team Vulcan</span>
+    <!-- Current page: Points disputes (matches the live app) -->
+    <div class="page-head">
+      <div>
+        <h1>Points disputes</h1>
+        <p class="sub">Solver awards are written when an assigned issue is marked resolved. Reporter points are written when two independent reviewers accept the issue as real.</p>
+      </div>
+      <button class="btn" type="button">Open a dispute</button>
     </div>
 
-    <!-- Disputes section on the issue -->
-    <section class="panel" aria-label="Disputes">
-      <div class="panel-head">
-        <h2>Disputes (3)</h2>
-        <button class="btn" type="button">Raise a dispute</button>
-      </div>
-
-      <div class="dispute">
-        <div class="dispute-top">
+    <section aria-label="Open queue">
+      <div class="section-title"><h2>Open queue</h2><span class="count">(2)</span></div>
+      <div class="card dispute">
+        <div class="row-top">
           <span class="pill open">Open</span>
-          <span class="kind">Verdict: goodToMerge</span>
+          <span class="kind">Wrong entry</span>
         </div>
-        <p><span class="label">Decision contested</span> Good-to-merge verdict from Tester Agent B on PR #386.</p>
-        <p><span class="label">Decided by</span> Tester Agent B (weight 1) · Tenant admin reviewing</p>
-        <p><span class="label">Your reason</span> The checks on this head were still running when the verdict was filed.</p>
-        <p><span class="label">Evidence</span> <a href="#">CI run link</a></p>
-        <p><span class="label">Last update</span> Waiting for a tenant admin decision (2 days)</p>
-        <div class="actions">
-          <button class="btn ghost" type="button">Add a reply</button>
-          <button class="btn ghost" type="button">Withdraw</button>
-        </div>
+        <p><span class="label">Entry disputed</span> Points entry on issue #2219</p>
+        <p><span class="label">Raised by</span> Demo Builder</p>
+        <p><span class="label">Decided by</span> Workspace admin</p>
+        <p><span class="label">Reason</span> The award was credited to the wrong solver.</p>
       </div>
+      <div class="card dispute">
+        <div class="row-top">
+          <span class="pill open">Open</span>
+          <span class="kind">Missing award</span>
+        </div>
+        <p><span class="label">Entry disputed</span> Reporter points on issue #1445</p>
+        <p><span class="label">Raised by</span> Demo Lead</p>
+        <p><span class="label">Decided by</span> Workspace admin</p>
+        <p><span class="label">Reason</span> Two reviewers accepted the issue, but no reporter points were written.</p>
+      </div>
+    </section>
 
-      <div class="dispute">
-        <div class="dispute-top">
+    <section aria-label="Your disputes">
+      <div class="section-title"><h2>Your disputes</h2></div>
+      <div class="card dispute">
+        <div class="row-top">
           <span class="pill granted">Granted</span>
           <span class="kind">Missing award</span>
         </div>
-        <p><span class="label">Decision contested</span> Accepted work did not receive its award.</p>
-        <p><span class="label">Decided by</span> Tenant admin</p>
-        <p><span class="label">Decision reason</span> Award recalculated and credited on re-check.</p>
-        <p><span class="label">Outcome</span> Granted: points credited to the owner.</p>
+        <p><span class="label">Decided by</span> Workspace admin</p>
+        <p><span class="label">Outcome</span> Points credited to the owner.</p>
       </div>
-
-      <div class="dispute">
-        <div class="dispute-top">
+      <div class="card dispute">
+        <div class="row-top">
           <span class="pill rejected">Rejected</span>
           <span class="kind">Wrong entry</span>
         </div>
-        <p><span class="label">Decision contested</span> Points entry for the merge review.</p>
-        <p><span class="label">Decided by</span> Tenant admin</p>
-        <p><span class="label">Decision reason</span> The entry matches the merged work. No change made.</p>
-        <p><span class="label">Outcome</span> Rejected. You can add new evidence to reopen.</p>
+        <p><span class="label">Decided by</span> Workspace admin</p>
+        <p><span class="label">Outcome</span> The entry matches the merged work. No change made.</p>
       </div>
     </section>
 
-    <!-- New dispute form -->
-    <section class="panel" aria-label="Raise a dispute">
-      <div class="panel-head">
-        <h2>Raise a dispute</h2>
-      </div>
-      <form class="form" onsubmit="return false;">
-        <div class="row">
-          <label>
-            What are you disputing?
-            <select>
-              <option>A verdict (goodToMerge or bad)</option>
-              <option>A merge or acceptance decision</option>
-              <option>An award or points entry</option>
-              <option>Something else on this issue</option>
-            </select>
-          </label>
-          <label>
-            Which decision?
-            <select>
-              <option>Tester Agent B · goodToMerge</option>
-              <option>Merge review · tenant admin</option>
-            </select>
-          </label>
+    <section aria-label="Your points entries">
+      <div class="section-title"><h2>Your points entries</h2></div>
+      <div class="card empty">No points yet. Resolve an assigned issue to earn the first ones.</div>
+    </section>
+
+    <!-- Proposed additions -->
+    <section class="card proposed-box" aria-label="Proposed: disputes on issues">
+      <div class="section-title"><h2>Disputes on an issue</h2><span class="tag proposed">Proposed</span></div>
+      <p class="sub" style="margin-bottom: 14px;">Today, disputes only cover points. This adds a dispute on the issue itself, so you can contest a verdict or a merge decision where it happened.</p>
+
+      <div class="card dispute" style="margin-bottom: 12px;">
+        <div class="row-top">
+          <span class="pill open">Open</span>
+          <span class="kind">Verdict: goodToMerge</span>
         </div>
-        <label>
-          Your reason
-          <textarea placeholder="Say what is wrong, in one or two sentences."></textarea>
-          <span class="hint">Be specific. Quote the line or check that is wrong.</span>
-        </label>
-        <label>
-          Evidence link (optional)
-          <input type="url" placeholder="https://">
-        </label>
-        <label>
-          Outcome you want
-          <select>
-            <option>Reverse the decision</option>
-            <option>Re-check and decide again</option>
-            <option>Just record my view</option>
-          </select>
-        </label>
+        <p><span class="label">Decision contested</span> Good-to-merge verdict from Tester Agent B.</p>
+        <p><span class="label">Decided by</span> Tester Agent B · reviewed by a workspace admin</p>
+        <p><span class="label">Your reason</span> The checks on this head were still running when the verdict was filed.</p>
+        <p><span class="label">Last update</span> Waiting for an admin decision (2 days)</p>
         <div class="actions">
-          <button class="btn" type="submit">Submit dispute</button>
-          <button class="btn ghost" type="button">Cancel</button>
+          <button class="btn ghost small" type="button">Add a reply</button>
+          <button class="btn ghost small" type="button">Withdraw</button>
         </div>
-        <div class="note">
-          Disputes are decided by a tenant admin. Everyone sees the reason, the decider and the outcome. Agents who gave the disputed verdict are told to re-review.
-        </div>
-      </form>
-    </section>
+      </div>
 
-    <!-- Top-level list -->
-    <section class="panel" aria-label="All my disputes">
-      <div class="panel-head">
-        <h2>All my disputes</h2>
-        <span class="kind">Across all issues</span>
-      </div>
-      <div class="list-row">
-        <span class="pill open">Open</span>
-        <span>Verdict on PR #386 · Desktop: Saved profile details</span>
-        <span class="decider">Tenant admin</span>
-      </div>
-      <div class="list-row">
-        <span class="pill granted">Granted</span>
-        <span>Missing award · Accepted work on issue #2219</span>
-        <span class="decider">Tenant admin</span>
-      </div>
-      <div class="list-row">
-        <span class="pill rejected">Rejected</span>
-        <span>Wrong entry · Merge review points</span>
-        <span class="decider">Tenant admin</span>
+      <div class="card">
+        <h2 style="margin-bottom: 12px;">Raise a dispute on this issue</h2>
+        <form class="form" onsubmit="return false;">
+          <div class="row">
+            <label>
+              What are you disputing?
+              <select>
+                <option>A verdict (goodToMerge or bad)</option>
+                <option>A merge or acceptance decision</option>
+                <option>An award or points entry</option>
+              </select>
+            </label>
+            <label>
+              Which decision?
+              <select>
+                <option>Tester Agent B · goodToMerge</option>
+                <option>Merge review · workspace admin</option>
+              </select>
+            </label>
+          </div>
+          <label>
+            Your reason
+            <textarea placeholder="Say what is wrong, in one or two sentences."></textarea>
+            <span class="hint">Be specific. Quote the line or check that is wrong.</span>
+          </label>
+          <label>
+            Evidence link (optional)
+            <input type="url" placeholder="https://">
+          </label>
+          <div class="actions">
+            <button class="btn" type="submit">Submit dispute</button>
+            <button class="btn ghost" type="button">Cancel</button>
+          </div>
+          <div class="note">Only a workspace admin can decide a dispute. Everyone sees the reason, the decider and the outcome. Agents who gave the disputed verdict are asked to re-review.</div>
+        </form>
       </div>
     </section>
   </main>
