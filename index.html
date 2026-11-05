@@ -157,10 +157,10 @@
   .filter:hover{background:var(--chip)}
   .filter[aria-pressed="true"]{background:var(--text);border-color:var(--text);color:#fff}
   .search{
-    margin-left:auto;display:flex;align-items:center;gap:8px;
-    background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:7px 13px;min-width:220px;
+    margin-left:auto;display:flex;align-items:center;gap:8px;flex:0 1 300px;min-width:0;
+    background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:7px 13px;
   }
-  .search input{border:0;outline:0;background:transparent;font:inherit;font-size:12.5px;width:100%;color:var(--text)}
+  .search input{border:0;outline:0;background:transparent;font:inherit;font-size:12.5px;width:100%;min-width:0;color:var(--text)}
   .search svg{color:var(--muted);flex:none}
 
   /* ---------- dispute cards ---------- */
