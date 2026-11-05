@@ -1,249 +1,963 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ziki: Disputes (design draft)</title>
-  <style>
-    :root {
-      --bg: #f5f7fc;
-      --card: #ffffff;
-      --text: #15121f;
-      --text2: #5d6275;
-      --line: #e2e6f0;
-      --primary: #2756b8;
-      --primary-tint: #e8eefb;
-      --warn-bg: #fff4e0;
-      --warn-fg: #9a5a00;
-      --ok-bg: #e4f6ec;
-      --ok-fg: #1f7a45;
-      --no-bg: #eceef3;
-      --no-fg: #4a4f5e;
-      --proposed-bg: #f1ecff;
-      --proposed-fg: #5b3fc4;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.5;
-    }
-    .draft-banner {
-      background: #15121f;
-      color: #fff;
-      text-align: center;
-      font-size: 13px;
-      padding: 8px 12px;
-    }
-    main { max-width: 960px; margin: 0 auto; padding: 24px 16px 48px; }
-    .page-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
-    h1 { font-size: 22px; margin: 0; }
-    h2 { font-size: 16px; margin: 0; }
-    .sub { color: var(--text2); font-size: 14px; margin: 4px 0 0; }
-    .btn {
-      font: inherit;
-      font-size: 14px;
-      font-weight: 500;
-      padding: 8px 16px;
-      border-radius: 999px;
-      border: 1px solid var(--primary);
-      background: var(--primary);
-      color: #fff;
-      cursor: pointer;
-    }
-    .btn.ghost { background: #fff; color: var(--primary); }
-    .btn.small { font-size: 13px; padding: 6px 12px; }
-    .section-title { display: flex; align-items: center; gap: 8px; margin: 24px 0 10px; }
-    .count { color: var(--text2); font-size: 14px; font-weight: 400; }
-    .card {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: 16px;
-      margin-bottom: 12px;
-    }
-    .empty { color: var(--text2); font-size: 14px; }
-    .tag {
-      display: inline-block;
-      font-size: 11px;
-      font-weight: 600;
-      padding: 2px 8px;
-      border-radius: 999px;
-      background: var(--primary-tint);
-      color: var(--primary);
-    }
-    .tag.proposed { background: var(--proposed-bg); color: var(--proposed-fg); }
-    .pill { display: inline-block; font-size: 12px; font-weight: 500; padding: 2px 10px; border-radius: 999px; }
-    .pill.open { background: var(--warn-bg); color: var(--warn-fg); }
-    .pill.granted { background: var(--ok-bg); color: var(--ok-fg); }
-    .pill.rejected { background: var(--no-bg); color: var(--no-fg); }
-    .row-top { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 6px; }
-    .kind { font-size: 12px; color: var(--text2); }
-    .dispute p { margin: 4px 0; font-size: 14px; }
-    .label { color: var(--text2); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .03em; }
-    .actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
-    .form { display: grid; gap: 14px; }
-    .form label { display: grid; gap: 6px; font-size: 13px; font-weight: 500; }
-    .form input, .form select, .form textarea {
-      font: inherit;
-      font-weight: 400;
-      font-size: 14px;
-      padding: 9px 12px;
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      background: #fff;
-      color: var(--text);
-    }
-    .form textarea { min-height: 84px; resize: vertical; }
-    .hint { font-size: 12px; color: var(--text2); font-weight: 400; }
-    .row { display: grid; gap: 14px; grid-template-columns: 1fr 1fr; }
-    @media (max-width: 640px) { .row { grid-template-columns: 1fr; } }
-    .note { font-size: 13px; color: var(--text2); background: var(--primary-tint); border-radius: 10px; padding: 10px 12px; }
-    .proposed-box { border: 1px dashed #b9a8f0; background: #fbfaff; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ziki · $ disputes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f5f7fc;
+    --surface:#ffffff;
+    --text:#15121f;
+    --text2:#3e4a63;
+    --muted:#5f6577;
+    --border:#e3e8f2;
+    --divider:#eef1f7;
+    --tint:#eaf2fe;
+    --chip:#f0f2f7;
+    --accent:#1f5fd9;
+    --accent-strong:#1749a8;
+    --ok-bg:#e3f6ec; --ok-fg:#146c43;
+    --bad-bg:#fde8e4; --bad-fg:#a3261a;
+    --warn-bg:#fdf3d7; --warn-fg:#7a4e00;
+    --info-bg:#e7f0ff; --info-fg:#1d4fb8;
+    --shadow:0 1px 2px rgba(21,18,31,.04), 0 8px 24px -16px rgba(21,18,31,.18);
+    --shadow-lg:0 24px 60px -24px rgba(21,18,31,.28), 0 2px 8px rgba(21,18,31,.06);
+    --r:20px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:"Manrope",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-size:14px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  button{font:inherit;color:inherit}
+  a{color:inherit}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+  /* ---------- top bar ---------- */
+  .topbar{
+    position:sticky;top:0;z-index:30;
+    background:rgba(255,255,255,.88);
+    backdrop-filter:saturate(180%) blur(12px);
+    border-bottom:1px solid var(--border);
+  }
+  .topbar-in{
+    max-width:1200px;margin:0 auto;padding:0 20px;
+    height:60px;display:flex;align-items:center;gap:20px;
+  }
+  .brand{display:flex;align-items:center;gap:9px;font-weight:800;letter-spacing:-.02em;font-size:17px;text-decoration:none}
+  .mark{
+    width:26px;height:26px;border-radius:9px;
+    background:linear-gradient(145deg,#2f74f0,#1b4fbe);
+    display:grid;place-items:center;color:#fff;font-size:13px;font-weight:800;
+    box-shadow:0 4px 10px -4px rgba(31,95,217,.7);
+  }
+  .project{
+    display:inline-flex;align-items:center;gap:7px;
+    background:var(--chip);border:1px solid var(--border);
+    padding:5px 10px;border-radius:999px;font-size:12.5px;font-weight:600;color:var(--text2);
+  }
+  .project .dot{width:6px;height:6px;border-radius:50%;background:var(--ok-fg)}
+  .topnav{display:flex;gap:2px;margin-left:6px}
+  .topnav a{
+    text-decoration:none;font-size:13.5px;font-weight:600;color:var(--muted);
+    padding:8px 12px;border-radius:10px;transition:background .15s,color .15s;
+  }
+  .topnav a:hover{background:var(--chip);color:var(--text)}
+  .topnav a[aria-current="page"]{background:var(--tint);color:var(--accent)}
+  .topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+  .icon-btn{
+    width:36px;height:36px;border-radius:10px;border:1px solid transparent;background:transparent;
+    display:grid;place-items:center;cursor:pointer;color:var(--muted);transition:.15s;
+  }
+  .icon-btn:hover{background:var(--chip);color:var(--text)}
+  .avatar{
+    width:34px;height:34px;border-radius:50%;border:0;cursor:pointer;
+    background:linear-gradient(145deg,#dfe9fb,#c7d8f6);color:#1749a8;
+    font-size:12px;font-weight:800;display:grid;place-items:center;
+  }
+  @media (max-width:860px){.topnav{display:none}}
+
+  /* ---------- page ---------- */
+  .page{max-width:1200px;margin:0 auto;padding:28px 20px 72px}
+  .page-head{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:6px;
+    font-size:11.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);
+  }
+  h1{font-size:30px;line-height:1.15;letter-spacing:-.03em;font-weight:800;margin:6px 0 6px}
+  .lede{color:var(--text2);max-width:640px;margin:0;font-size:14.5px}
+  .lede b{color:var(--text);font-weight:700}
+
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:7px;
+    border-radius:999px;border:1px solid transparent;cursor:pointer;
+    font-size:13.5px;font-weight:700;padding:10px 18px;text-decoration:none;
+    transition:transform .12s,background .15s,box-shadow .15s;
+  }
+  .btn:active{transform:translateY(1px)}
+  .btn-primary{background:var(--accent);color:#fff;box-shadow:0 8px 18px -10px rgba(31,95,217,.9)}
+  .btn-primary:hover{background:var(--accent-strong)}
+  .btn-ghost{background:var(--surface);color:var(--text2);border-color:var(--border)}
+  .btn-ghost:hover{background:var(--chip)}
+  .btn-danger{background:var(--bad-fg);color:#fff}
+  .btn-sm{padding:7px 13px;font-size:12.5px}
+  .btn:focus-visible,.icon-btn:focus-visible,.tab:focus-visible,.card-action:focus-visible,.filter:focus-visible{
+    outline:2px solid var(--accent);outline-offset:2px;
+  }
+
+  /* ---------- stats ---------- */
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:22px 0 24px}
+  .stat{
+    background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:15px 17px;
+    box-shadow:var(--shadow);
+  }
+  .stat .k{font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+  .stat .v{font-size:26px;font-weight:800;letter-spacing:-.02em;margin-top:4px}
+  .stat .v small{font-size:13px;font-weight:600;color:var(--muted);letter-spacing:0}
+  .stat .trend{font-size:12px;font-weight:600;color:var(--ok-fg);margin-top:2px}
+  @media (max-width:720px){.stats{grid-template-columns:1fr}}
+
+  /* ---------- tabs ---------- */
+  .tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:16px}
+  .tab{
+    position:relative;background:none;border:0;cursor:pointer;
+    padding:11px 14px;font-size:14px;font-weight:700;color:var(--muted);
+    border-radius:10px 10px 0 0;
+  }
+  .tab:hover{color:var(--text);background:var(--chip)}
+  .tab[aria-selected="true"]{color:var(--accent)}
+  .tab[aria-selected="true"]::after{
+    content:"";position:absolute;left:12px;right:12px;bottom:-1px;height:2.5px;border-radius:2px;background:var(--accent);
+  }
+  .tab .count{
+    display:inline-block;margin-left:7px;background:var(--chip);color:var(--text2);
+    border-radius:999px;padding:1px 7px;font-size:11px;font-weight:800;
+  }
+  .tab[aria-selected="true"] .count{background:var(--tint);color:var(--accent)}
+  .tab .new{
+    display:inline-block;margin-left:7px;background:var(--ok-bg);color:var(--ok-fg);
+    border-radius:999px;padding:1px 7px;font-size:10.5px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;
+  }
+
+  /* ---------- toolbar ---------- */
+  .toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .filter{
+    background:var(--surface);border:1px solid var(--border);border-radius:999px;
+    padding:7px 13px;font-size:12.5px;font-weight:700;color:var(--text2);cursor:pointer;
+  }
+  .filter:hover{background:var(--chip)}
+  .filter[aria-pressed="true"]{background:var(--text);border-color:var(--text);color:#fff}
+  .search{
+    margin-left:auto;display:flex;align-items:center;gap:8px;
+    background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:7px 13px;min-width:220px;
+  }
+  .search input{border:0;outline:0;background:transparent;font:inherit;font-size:12.5px;width:100%;color:var(--text)}
+  .search svg{color:var(--muted);flex:none}
+
+  /* ---------- dispute cards ---------- */
+  .list{display:grid;gap:10px}
+  .card{
+    background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+    padding:18px 18px 16px;box-shadow:var(--shadow);
+    display:grid;grid-template-columns:1fr auto;gap:6px 18px;
+    transition:border-color .15s,box-shadow .15s,transform .15s;
+  }
+  .card:hover{border-color:#cfd9ec;box-shadow:0 2px 4px rgba(21,18,31,.04),0 16px 40px -24px rgba(21,18,31,.28)}
+  .card-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0}
+  .pill{
+    display:inline-flex;align-items:center;gap:5px;
+    border-radius:999px;padding:3px 9px;font-size:11.5px;font-weight:800;letter-spacing:.01em;
+  }
+  .pill.open{background:var(--warn-bg);color:var(--warn-fg)}
+  .pill.granted{background:var(--ok-bg);color:var(--ok-fg)}
+  .pill.rejected{background:var(--chip);color:var(--muted)}
+  .pill.review{background:var(--info-bg);color:var(--info-fg)}
+  .pill .led{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.75}
+  .chip{
+    display:inline-flex;align-items:center;border-radius:999px;background:var(--chip);
+    padding:3px 9px;font-size:11.5px;font-weight:700;color:var(--text2);white-space:nowrap;
+  }
+  .chip.accent{background:var(--tint);color:var(--accent)}
+  .issue-link{
+    font-weight:800;font-size:13px;color:var(--text);text-decoration:none;
+    border-radius:6px;padding:1px 2px;white-space:nowrap;
+  }
+  .issue-link:hover{color:var(--accent);text-decoration:underline;text-underline-offset:2px}
+  .card h3{grid-column:1;margin:8px 0 2px;font-size:15px;font-weight:800;letter-spacing:-.01em;line-height:1.35}
+  .reason{grid-column:1;margin:0;color:var(--text2);font-size:13.5px}
+  .reason .q{color:var(--muted)}
+  .meta{grid-column:1;display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;font-size:12px;color:var(--muted)}
+  .meta b{color:var(--text2);font-weight:700}
+  .amount{
+    grid-row:1 / span 3;grid-column:2;align-self:start;text-align:right;
+    font-size:19px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;
+  }
+  .amount small{display:block;font-size:10.5px;font-weight:700;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+  .amount.pos{color:var(--ok-fg)}
+  .amount.neg{color:var(--bad-fg)}
+  .card-foot{grid-column:1 / -1;display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid var(--divider)}
+  .card-action{
+    margin-left:auto;background:var(--surface);border:1px solid var(--border);border-radius:999px;
+    padding:6px 13px;font-size:12.5px;font-weight:700;color:var(--text2);cursor:pointer;
+  }
+  .card-action:hover{background:var(--chip);color:var(--text)}
+  .who{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted)}
+  .who .mini{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:9px;font-weight:800;background:var(--tint);color:var(--accent)}
+  .who .mini.g{background:var(--ok-bg);color:var(--ok-fg)}
+  .who b{color:var(--text2);font-weight:700}
+  @media (max-width:640px){
+    .card{grid-template-columns:1fr}
+    .amount{grid-row:auto;grid-column:1;text-align:left;margin-top:8px}
+    .search{min-width:0;width:100%;margin-left:0}
+  }
+
+  /* ---------- empty ---------- */
+  .empty{
+    border:1px dashed var(--border);border-radius:var(--r);background:rgba(255,255,255,.55);
+    padding:34px 20px;text-align:center;color:var(--text2);
+  }
+  .empty .ic{width:42px;height:42px;border-radius:14px;background:var(--tint);color:var(--accent);display:grid;place-items:center;margin:0 auto 10px}
+  .empty h3{margin:0 0 4px;font-size:15px;color:var(--text)}
+  .empty p{margin:0 auto;max-width:420px;font-size:13px}
+
+  /* ---------- drawer ---------- */
+  .scrim{
+    position:fixed;inset:0;background:rgba(21,18,31,.38);opacity:0;pointer-events:none;
+    transition:opacity .2s;z-index:40;backdrop-filter:blur(2px);
+  }
+  .scrim.on{opacity:1;pointer-events:auto}
+  .drawer{
+    position:fixed;top:0;right:0;bottom:0;width:min(480px,100%);
+    background:var(--surface);z-index:50;transform:translateX(102%);
+    transition:transform .26s cubic-bezier(.22,.61,.36,1);
+    box-shadow:var(--shadow-lg);display:flex;flex-direction:column;
+  }
+  .drawer.on{transform:none}
+  .drawer-head{
+    padding:18px 20px 14px;border-bottom:1px solid var(--divider);
+    display:flex;align-items:flex-start;gap:12px;
+  }
+  .drawer-head h2{margin:2px 0 0;font-size:17px;font-weight:800;letter-spacing:-.02em;line-height:1.3}
+  .drawer-head .sub{font-size:12.5px;color:var(--muted);margin:3px 0 0}
+  .drawer-body{padding:18px 20px;overflow:auto;flex:1}
+  .drawer-foot{padding:14px 20px;border-top:1px solid var(--divider);display:flex;gap:8px;flex-wrap:wrap;background:#fbfcfe}
+  .close{
+    margin-left:auto;flex:none;width:32px;height:32px;border-radius:9px;border:1px solid var(--border);
+    background:var(--surface);display:grid;place-items:center;cursor:pointer;color:var(--muted);
+  }
+  .close:hover{background:var(--chip);color:var(--text)}
+  .field{margin-bottom:16px}
+  .field .lab{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+  .field .val{font-size:13.5px;color:var(--text2)}
+  .field .val b{color:var(--text)}
+  .quote{
+    background:var(--bg);border:1px solid var(--border);border-left:3px solid var(--accent);
+    border-radius:0 12px 12px 0;padding:11px 13px;font-size:13.5px;color:var(--text2);
+  }
+  .evidence{
+    display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--accent);
+    text-decoration:none;background:var(--tint);border-radius:12px;padding:10px 12px;
+  }
+  .evidence:hover{background:#dfeafe}
+  .timeline{list-style:none;margin:0;padding:0 0 0 18px;position:relative}
+  .timeline::before{content:"";position:absolute;left:4px;top:6px;bottom:6px;width:2px;background:var(--divider);border-radius:2px}
+  .timeline li{position:relative;padding:0 0 16px 12px}
+  .timeline li:last-child{padding-bottom:0}
+  .timeline li::before{
+    content:"";position:absolute;left:-18px;top:4px;width:10px;height:10px;border-radius:50%;
+    background:var(--surface);border:2.5px solid var(--border);
+  }
+  .timeline li.done::before{border-color:var(--ok-fg);background:var(--ok-bg)}
+  .timeline li.now::before{border-color:var(--accent);background:var(--tint)}
+  .timeline .t{font-size:13px;font-weight:700;color:var(--text)}
+  .timeline .d{font-size:12px;color:var(--muted);margin-top:1px}
+  .admin-box{background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:13px}
+  .admin-box h4{margin:0 0 4px;font-size:13px;font-weight:800}
+  .admin-box p{margin:0 0 11px;font-size:12.5px;color:var(--muted)}
+
+  /* ---------- modal ---------- */
+  .modal{
+    position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:20px;
+    opacity:0;pointer-events:none;transition:opacity .18s;
+  }
+  .modal.on{opacity:1;pointer-events:auto}
+  .modal-card{
+    width:min(560px,100%);max-height:92vh;overflow:auto;background:var(--surface);
+    border-radius:24px;box-shadow:var(--shadow-lg);transform:translateY(10px) scale(.99);
+    transition:transform .2s;
+  }
+  .modal.on .modal-card{transform:none}
+  .modal-head{padding:20px 22px 0;display:flex;align-items:flex-start;gap:12px}
+  .modal-head h2{margin:0;font-size:19px;font-weight:800;letter-spacing:-.02em}
+  .modal-head p{margin:4px 0 0;font-size:13px;color:var(--muted)}
+  .modal-body{padding:18px 22px 4px}
+  .modal-foot{padding:14px 22px 20px;display:flex;gap:8px;justify-content:flex-end}
+  .seg{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--chip);border-radius:12px;padding:4px;margin-bottom:16px}
+  .seg button{
+    border:0;background:transparent;border-radius:9px;padding:8px 10px;font-size:12.5px;font-weight:700;
+    color:var(--text2);cursor:pointer;
+  }
+  .seg button[aria-pressed="true"]{background:var(--surface);color:var(--text);box-shadow:0 1px 3px rgba(21,18,31,.12)}
+  label.fl{display:block;font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:6px}
+  .inp,.sel,.ta{
+    width:100%;border:1px solid var(--border);border-radius:12px;background:var(--surface);
+    padding:10px 12px;font:inherit;font-size:13.5px;color:var(--text);outline:0;
+  }
+  .inp:focus,.sel:focus,.ta:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(31,95,217,.14)}
+  .ta{min-height:92px;resize:vertical}
+  .hint{font-size:11.5px;color:var(--muted);margin-top:5px}
+  .fgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media (max-width:560px){.fgrid{grid-template-columns:1fr}}
+  .radio{display:flex;gap:9px;align-items:flex-start;border:1px solid var(--border);border-radius:12px;padding:11px 12px;cursor:pointer;margin-bottom:8px}
+  .radio:hover{background:var(--bg)}
+  .radio input{margin-top:3px;accent-color:var(--accent)}
+  .radio .rt{font-size:13px;font-weight:700}
+  .radio .rd{font-size:12px;color:var(--muted)}
+
+  /* ---------- toast ---------- */
+  .toast{
+    position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);
+    background:var(--text);color:#fff;border-radius:999px;padding:11px 18px;
+    font-size:13px;font-weight:700;box-shadow:var(--shadow-lg);
+    opacity:0;pointer-events:none;transition:.22s;z-index:80;display:flex;align-items:center;gap:8px;
+  }
+  .toast.on{opacity:1;transform:translate(-50%,0)}
+
+  .footnote{
+    max-width:1200px;margin:0 auto;padding:0 20px 40px;color:var(--muted);font-size:12px;
+    display:flex;gap:14px;flex-wrap:wrap;align-items:center;
+  }
+  .footnote a{color:var(--text2);font-weight:700;text-decoration:none}
+  .footnote a:hover{color:var(--accent);text-decoration:underline}
+  .sep{width:4px;height:4px;border-radius:50%;background:var(--border)}
+</style>
 </head>
 <body>
-  <div class="draft-banner">Design draft for review. Not approved, not implemented. Purple sections are proposed additions.</div>
 
-  <main>
-    <!-- Current page: Points disputes (matches the live app) -->
-    <div class="page-head">
-      <div>
-        <h1>Points disputes</h1>
-        <p class="sub">Solver awards are written when an assigned issue is marked resolved. Reporter points are written when two independent reviewers accept the issue as real.</p>
-      </div>
-      <button class="btn" type="button">Open a dispute</button>
+<header class="topbar">
+  <div class="topbar-in">
+    <a class="brand" href="#" aria-label="Ziki home">
+      <span class="mark" aria-hidden="true">Z</span> Ziki
+    </a>
+    <span class="project"><span class="dot" aria-hidden="true"></span> Zedu</span>
+    <nav class="topnav" aria-label="Main">
+      <a href="#">Work</a>
+      <a href="#">Issues</a>
+      <a href="#" aria-current="page">Points</a>
+      <a href="#">Marketing</a>
+      <a href="#">Agents</a>
+    </nav>
+    <div class="topbar-right">
+      <button class="icon-btn" aria-label="Search" type="button">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
+      </button>
+      <button class="icon-btn" aria-label="Notifications, 2 unread" type="button">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+      </button>
+      <button class="avatar" aria-label="Account: Afolabi Abdulbasit" type="button">AA</button>
     </div>
+  </div>
+</header>
 
-    <section class="card" aria-label="Credit missing awards">
-      <h2 style="margin-bottom: 8px;">Credit missing awards</h2>
-      <p class="sub" style="margin-bottom: 14px;">Solver points need a resolved or closed issue with an assignee. Reporter points are withheld on duplicates. An award that is already in the ledger is not added again.</p>
-      <form class="form" onsubmit="return false;">
-        <label>
-          Issue numbers
-          <textarea placeholder="269, 270, 10, 271, 272, 273"></textarea>
-        </label>
-        <label>
-          Award type
-          <select>
-            <option>Solver award</option>
-            <option>Reporter award</option>
-          </select>
-        </label>
-        <div class="actions">
-          <button class="btn" type="submit">Credit awards</button>
-        </div>
-      </form>
-    </section>
+<main class="page">
+  <div class="page-head">
+    <div>
+      <span class="eyebrow">Points</span>
+      <h1>$ disputes</h1>
+      <p class="lede">Say an award is missing or wrong and a workspace admin resolves it. Points are never deleted — a correction is a <b>reversing entry</b>, so every ledger line keeps its history.</p>
+    </div>
+    <button class="btn btn-primary" id="openDispute" type="button">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      Open a dispute
+    </button>
+  </div>
 
-    <section aria-label="Open queue">
-      <div class="section-title"><h2>Open queue</h2><span class="count">(2)</span></div>
-      <div class="card dispute">
-        <div class="row-top">
-          <span class="pill open">Open</span>
-          <span class="kind">Wrong entry</span>
+  <div class="stats">
+    <div class="stat">
+      <div class="k">Open disputes</div>
+      <div class="v">3</div>
+      <div class="trend">2 need an admin decision</div>
+    </div>
+    <div class="stat">
+      <div class="k">Resolved · 30 days</div>
+      <div class="v">11</div>
+      <div class="trend">9 granted · 2 rejected</div>
+    </div>
+    <div class="stat">
+      <div class="k">Recovered for the team</div>
+      <div class="v">$46.50</div>
+      <div class="trend">Median decision: 1.4 days</div>
+    </div>
+  </div>
+
+  <div class="tabs" role="tablist" aria-label="Dispute type">
+    <button class="tab" role="tab" id="tab-decisions" aria-controls="panel-decisions" aria-selected="true" data-panel="panel-decisions">
+      Decision disputes <span class="new">New</span>
+    </button>
+    <button class="tab" role="tab" id="tab-points" aria-controls="panel-points" aria-selected="false" data-panel="panel-points">
+      Points disputes <span class="count">4</span>
+    </button>
+  </div>
+
+  <div class="toolbar">
+    <button class="filter" type="button" aria-pressed="true" data-status="all">All</button>
+    <button class="filter" type="button" aria-pressed="false" data-status="open">Open</button>
+    <button class="filter" type="button" aria-pressed="false" data-status="review">In review</button>
+    <button class="filter" type="button" aria-pressed="false" data-status="granted">Granted</button>
+    <button class="filter" type="button" aria-pressed="false" data-status="rejected">Rejected</button>
+    <label class="search">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
+      <span class="sr-only">Search disputes</span>
+      <input type="search" placeholder="Search issue, reason or person" id="search">
+    </label>
+  </div>
+
+  <!-- ================= DECISION DISPUTES ================= -->
+  <section id="panel-decisions" role="tabpanel" aria-labelledby="tab-decisions">
+    <div class="list" id="list-decisions">
+
+      <article class="card" data-status="open" data-search="2740 verdict goodtomerging checks pending tester agent b adaeze">
+        <div class="card-top">
+          <span class="pill open"><span class="led"></span> Open</span>
+          <span class="chip accent">Verdict</span>
+          <a class="issue-link" href="#">#2740</a>
+          <span class="chip">goodToMerge</span>
         </div>
-        <p><span class="label">Entry disputed</span> Points entry on issue #2219</p>
-        <p><span class="label">Raised by</span> Demo Builder</p>
-        <p><span class="label">Decided by</span> Workspace admin</p>
-        <p><span class="label">Reason</span> The award was credited to the wrong solver.</p>
+        <h3>A good-to-merge verdict was filed before the checks finished</h3>
+        <p class="reason"><span class="q">“</span>The head it approved still had two checks running, and one of them failed a minute later.<span class="q">”</span></p>
+        <div class="meta">
+          <span>Raised by <b>Demo Builder</b></span>
+          <span>Decision by <b>Tester Agent B</b></span>
+          <span>Waiting <b>2 days</b></span>
+        </div>
+        <div class="amount">—<small>at stake</small></div>
+        <div class="card-foot">
+          <span class="who"><span class="mini">DB</span> <b>Demo Builder</b> · solver</span>
+          <button class="card-action" type="button" data-open="d1">Review dispute</button>
+        </div>
+      </article>
+
+      <article class="card" data-status="review" data-search="2732 merge accepted fix didn't address issue owner workspace admin">
+        <div class="card-top">
+          <span class="pill review"><span class="led"></span> In review</span>
+          <span class="chip accent">Merge decision</span>
+          <a class="issue-link" href="#">#2732</a>
+          <span class="chip">accepted</span>
+        </div>
+        <h3>The merge accepted a fix that never touched the reported bug</h3>
+        <p class="reason"><span class="q">“</span>The diff only renamed a variable. The share dialog still suggests you as a recipient.<span class="q">”</span></p>
+        <div class="meta">
+          <span>Raised by <b>Demo Lead</b></span>
+          <span>Decision by <b>Workspace admin</b></span>
+          <span>Re-review asked of <b>2 agents</b></span>
+        </div>
+        <div class="amount">$6.00<small>solver reward</small></div>
+        <div class="card-foot">
+          <span class="who"><span class="mini">DL</span> <b>Demo Lead</b> · reporter</span>
+          <button class="card-action" type="button" data-open="d2">Review dispute</button>
+        </div>
+      </article>
+
+      <article class="card" data-status="granted" data-search="2701 bad verdict fix passed checks granted points restored">
+        <div class="card-top">
+          <span class="pill granted"><span class="led"></span> Granted</span>
+          <span class="chip accent">Verdict</span>
+          <a class="issue-link" href="#">#2701</a>
+          <span class="chip">bad</span>
+        </div>
+        <h3>A “bad” verdict ignored a passing test run on the same head</h3>
+        <p class="reason"><span class="q">“</span>The reviewer read a stale check from the previous push. The current head was green.<span class="q">”</span></p>
+        <div class="meta">
+          <span>Raised by <b>Demo Builder</b></span>
+          <span>Granted by <b>Workspace admin</b></span>
+          <span>Resolved in <b>1 day</b></span>
+        </div>
+        <div class="amount pos">+$4.00<small>restored</small></div>
+        <div class="card-foot">
+          <span class="who"><span class="mini g">WA</span> <b>Workspace admin</b> · decided</span>
+          <button class="card-action" type="button" data-open="d3">View outcome</button>
+        </div>
+      </article>
+
+      <article class="card" data-status="rejected" data-search="2694 acceptance duplicate rejected entry matches merged work">
+        <div class="card-top">
+          <span class="pill rejected"><span class="led"></span> Rejected</span>
+          <span class="chip accent">Merge decision</span>
+          <a class="issue-link" href="#">#2694</a>
+          <span class="chip">accepted</span>
+        </div>
+        <h3>Disputed acceptance of a duplicate report</h3>
+        <p class="reason"><span class="q">“</span>This was the same bug as #2688 and should not have earned a second reporter award.<span class="q">”</span></p>
+        <div class="meta">
+          <span>Raised by <b>Demo Lead</b></span>
+          <span>Rejected by <b>Workspace admin</b></span>
+          <span>Reason: <b>not a duplicate</b></span>
+        </div>
+        <div class="amount">$1.50<small>reporter award</small></div>
+        <div class="card-foot">
+          <span class="who"><span class="mini g">WA</span> <b>Workspace admin</b> · decided</span>
+          <button class="card-action" type="button" data-open="d4">View outcome</button>
+        </div>
+      </article>
+
+      <div class="empty" id="empty-decisions" hidden>
+        <div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg></div>
+        <h3>No disputes match that</h3>
+        <p>Try a different status or clear the search.</p>
       </div>
-      <div class="card dispute">
-        <div class="row-top">
-          <span class="pill open">Open</span>
-          <span class="kind">Missing award</span>
+    </div>
+  </section>
+
+  <!-- ================= POINTS DISPUTES ================= -->
+  <section id="panel-points" role="tabpanel" aria-labelledby="tab-points" hidden>
+    <div class="list" id="list-points">
+
+      <article class="card" data-status="open" data-search="2219 wrong entry award credited wrong solver points entry">
+        <div class="card-top">
+          <span class="pill open"><span class="led"></span> Open</span>
+          <span class="chip">Wrong entry</span>
+          <a class="issue-link" href="#">#2219</a>
+          <span class="chip">Solver award</span>
         </div>
-        <p><span class="label">Entry disputed</span> Reporter points on issue #1445</p>
-        <p><span class="label">Raised by</span> Demo Lead</p>
-        <p><span class="label">Decided by</span> Workspace admin</p>
-        <p><span class="label">Reason</span> Two reviewers accepted the issue, but no reporter points were written.</p>
+        <h3>The solver award was credited to the wrong person</h3>
+        <p class="reason"><span class="q">“</span>I resolved the issue, but the entry sits under another solver's name.<span class="q">”</span></p>
+        <div class="meta">
+          <span>Raised by <b>Demo Builder</b></span>
+          <span>Decided by <b>Workspace admin</b></span>
+          <span>Entry <b>#pe_8841</b></span>
+        </div>
+        <div class="amount">$4.00<small>disputed</small></div>
+        <div class="card-foot">
+          <span class="who"><span class="mini">DB</span> <b>Demo Builder</b> · solver</span>
+          <button class="card-action" type="button" data-open="p1">Review dispute</button>
+        </div>
+      </article>
+
+      <article class="card" data-status="open" data-search="1445 missing award reporter points two reviewers accepted">
+        <div class="card-top">
+          <span class="pill open"><span class="led"></span> Open</span>
+          <span class="chip">Missing award</span>
+          <a class="issue-link" href="#">#1445</a>
+          <span class="chip">Reporter award</span>
+        </div>
+        <h3>Two reviewers accepted the issue, but no reporter points were written</h3>
+        <p class="reason"><span class="q">“</span>Both acceptances are on the issue. The ledger has no entry for the reporter.<span class="q">”</span></p>
+        <div class="meta">
+          <span>Raised by <b>Demo Lead</b></span>
+          <span>Decided by <b>Workspace admin</b></span>
+          <span>Waiting <b>6 hours</b></span>
+        </div>
+        <div class="amount">$1.50<small>missing</small></div>
+        <div class="card-foot">
+          <span class="who"><span class="mini">DL</span> <b>Demo Lead</b> · reporter</span>
+          <button class="card-action" type="button" data-open="p2">Review dispute</button>
+        </div>
+      </article>
+
+      <article class="card" data-status="granted" data-search="2107 missing award granted credited reversing entry">
+        <div class="card-top">
+          <span class="pill granted"><span class="led"></span> Granted</span>
+          <span class="chip">Missing award</span>
+          <a class="issue-link" href="#">#2107</a>
+          <span class="chip">Solver award</span>
+        </div>
+        <h3>Missing solver award for a resolved issue</h3>
+        <p class="reason"><span class="q">“</span>The issue was resolved on Tuesday; the award never appeared.<span class="q">”</span></p>
+        <div class="meta">
+          <span>Raised by <b>Demo Builder</b></span>
+          <span>Granted by <b>Workspace admin</b></span>
+          <span>Correction <b>#pe_8902</b></span>
+        </div>
+        <div class="amount pos">+$3.00<small>credited</small></div>
+        <div class="card-foot">
+          <span class="who"><span class="mini g">WA</span> <b>Workspace admin</b> · decided</span>
+          <button class="card-action" type="button" data-open="p3">View outcome</button>
+        </div>
+      </article>
+
+      <article class="card" data-status="rejected" data-search="1998 wrong entry rejected matches merged work no change">
+        <div class="card-top">
+          <span class="pill rejected"><span class="led"></span> Rejected</span>
+          <span class="chip">Wrong entry</span>
+          <a class="issue-link" href="#">#1998</a>
+          <span class="chip">Reporter award</span>
+        </div>
+        <h3>The entry already matched the merged work</h3>
+        <p class="reason"><span class="q">“</span>The role on the entry looked wrong, but the merge record confirms it.<span class="q">”</span></p>
+        <div class="meta">
+          <span>Raised by <b>Demo Lead</b></span>
+          <span>Rejected by <b>Workspace admin</b></span>
+          <span>No change made</span>
+        </div>
+        <div class="amount">$1.50<small>disputed</small></div>
+        <div class="card-foot">
+          <span class="who"><span class="mini g">WA</span> <b>Workspace admin</b> · decided</span>
+          <button class="card-action" type="button" data-open="p4">View outcome</button>
+        </div>
+      </article>
+
+      <div class="empty" id="empty-points" hidden>
+        <div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg></div>
+        <h3>No disputes match that</h3>
+        <p>Try a different status or clear the search.</p>
       </div>
-    </section>
+    </div>
+  </section>
+</main>
 
-    <section aria-label="Your disputes">
-      <div class="section-title"><h2>Your disputes</h2></div>
-      <div class="card dispute">
-        <div class="row-top">
-          <span class="pill granted">Granted</span>
-          <span class="kind">Missing award</span>
-        </div>
-        <p><span class="label">Decided by</span> Workspace admin</p>
-        <p><span class="label">Outcome</span> Points credited to the owner.</p>
+<div class="footnote">
+  <span>Design v2 · decision disputes + points disputes</span>
+  <span class="sep" aria-hidden="true"></span>
+  <a href="notes.html">Design notes &amp; how to test</a>
+  <span class="sep" aria-hidden="true"></span>
+  <span>Built with Ziki's own tokens: Manrope, <code>--zk-*</code> colours, 20px cards</span>
+</div>
+
+<!-- ================= DRAWER ================= -->
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-hidden="true" aria-labelledby="drawerTitle" role="dialog" aria-modal="true">
+  <div class="drawer-head">
+    <div>
+      <div id="drawerPills" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px"></div>
+      <h2 id="drawerTitle">Dispute</h2>
+      <p class="sub" id="drawerSub"></p>
+    </div>
+    <button class="close" id="drawerClose" aria-label="Close" type="button">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <div class="drawer-body" id="drawerBody"></div>
+  <div class="drawer-foot" id="drawerFoot"></div>
+</aside>
+
+<!-- ================= MODAL ================= -->
+<div class="modal" id="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div>
+        <h2 id="modalTitle">Open a dispute</h2>
+        <p>An admin reads it, decides, and the ledger records the correction.</p>
       </div>
-      <div class="card dispute">
-        <div class="row-top">
-          <span class="pill rejected">Rejected</span>
-          <span class="kind">Wrong entry</span>
+      <button class="close" id="modalClose" aria-label="Close" type="button">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <form id="disputeForm">
+      <div class="modal-body">
+        <div class="seg" role="group" aria-label="What are you disputing?">
+          <button type="button" aria-pressed="true" data-kind="decision">A decision</button>
+          <button type="button" aria-pressed="false" data-kind="points">Points</button>
         </div>
-        <p><span class="label">Decided by</span> Workspace admin</p>
-        <p><span class="label">Outcome</span> The entry matches the merged work. No change made.</p>
-      </div>
-    </section>
 
-    <section aria-label="Your points entries">
-      <div class="section-title"><h2>Your points entries</h2></div>
-      <div class="card empty">No points yet. Resolve an assigned issue to earn the first ones.</div>
-    </section>
-
-    <!-- Proposed additions -->
-    <section class="card proposed-box" aria-label="Proposed: disputes on issues">
-      <div class="section-title"><h2>Disputes on an issue</h2><span class="tag proposed">Proposed</span></div>
-      <p class="sub" style="margin-bottom: 14px;">Today, disputes only cover points. This adds a dispute on the issue itself, so you can contest a verdict or a merge decision where it happened.</p>
-
-      <div class="card dispute" style="margin-bottom: 12px;">
-        <div class="row-top">
-          <span class="pill open">Open</span>
-          <span class="kind">Verdict: goodToMerge</span>
-        </div>
-        <p><span class="label">Decision contested</span> Good-to-merge verdict from Tester Agent B.</p>
-        <p><span class="label">Decided by</span> Tester Agent B · reviewed by a workspace admin</p>
-        <p><span class="label">Your reason</span> The checks on this head were still running when the verdict was filed.</p>
-        <p><span class="label">Last update</span> Waiting for an admin decision (2 days)</p>
-        <div class="actions">
-          <button class="btn ghost small" type="button">Add a reply</button>
-          <button class="btn ghost small" type="button">Withdraw</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <h2 style="margin-bottom: 12px;">Raise a dispute on this issue</h2>
-        <form class="form" onsubmit="return false;">
-          <div class="row">
-            <label>
-              What are you disputing?
-              <select>
-                <option>A verdict (goodToMerge or bad)</option>
-                <option>A merge or acceptance decision</option>
-                <option>An award or points entry</option>
-              </select>
-            </label>
-            <label>
-              Which decision?
-              <select>
-                <option>Tester Agent B · goodToMerge</option>
-                <option>Merge review · workspace admin</option>
-              </select>
-            </label>
+        <div class="fgrid">
+          <div style="margin-bottom:12px">
+            <label class="fl" for="issue">Issue number</label>
+            <input class="inp" id="issue" name="issue" inputmode="numeric" placeholder="2740" value="2740">
           </div>
-          <label>
-            Your reason
-            <textarea placeholder="Say what is wrong, in one or two sentences."></textarea>
-            <span class="hint">Be specific. Quote the line or check that is wrong.</span>
-          </label>
-          <label>
-            Evidence link (optional)
-            <input type="url" placeholder="https://">
-          </label>
-          <div class="actions">
-            <button class="btn" type="submit">Submit dispute</button>
-            <button class="btn ghost" type="button">Cancel</button>
+          <div style="margin-bottom:12px">
+            <label class="fl" for="which">Which decision?</label>
+            <select class="sel" id="which" name="which">
+              <option>Tester Agent B · goodToMerge</option>
+              <option>Merge review · workspace admin</option>
+              <option>Acceptance · 2 reviewers</option>
+            </select>
           </div>
-          <div class="note">Only a workspace admin can decide a dispute. Everyone sees the reason, the decider and the outcome. Agents who gave the disputed verdict are asked to re-review.</div>
-        </form>
+        </div>
+
+        <div style="margin-bottom:12px">
+          <label class="fl" for="reason">Why is it wrong?</label>
+          <textarea class="ta" id="reason" name="reason" placeholder="Say what happened, and quote the check or line that is wrong.">The checks on this head were still running when the verdict was filed, and one failed a minute later.</textarea>
+          <div class="hint">One or two sentences. Be specific — “the tests were stale” beats “it's wrong”.</div>
+        </div>
+
+        <div style="margin-bottom:12px">
+          <label class="fl" for="evidence">Evidence link <span style="font-weight:500;color:var(--muted)">(optional)</span></label>
+          <input class="inp" id="evidence" name="evidence" type="url" placeholder="https://github.com/…/checks">
+        </div>
+
+        <label class="radio">
+          <input type="checkbox" checked>
+          <span>
+            <span class="rt">Ask the agent who decided to re-review</span>
+            <span class="rd">They get a notification and can add context before an admin decides.</span>
+          </span>
+        </label>
       </div>
-    </section>
-  </main>
+      <div class="modal-foot">
+        <button class="btn btn-ghost" type="button" id="modalCancel">Cancel</button>
+        <button class="btn btn-primary" type="submit">Submit dispute</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+  <span id="toastText">Dispute opened. An admin will review it.</span>
+</div>
+
+<script>
+(function(){
+  var $ = function(s, r){ return (r||document).querySelector(s); };
+  var $$ = function(s, r){ return Array.prototype.slice.call((r||document).querySelectorAll(s)); };
+
+  /* ---------- tabs ---------- */
+  var tabs = $$('.tab');
+  tabs.forEach(function(tab){
+    tab.addEventListener('click', function(){
+      tabs.forEach(function(t){
+        var on = t === tab;
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+        document.getElementById(t.dataset.panel).hidden = !on;
+      });
+      applyFilter();
+    });
+  });
+
+  /* ---------- filters + search ---------- */
+  var activeStatus = 'all';
+  var filters = $$('.filter');
+  filters.forEach(function(f){
+    f.addEventListener('click', function(){
+      activeStatus = f.dataset.status;
+      filters.forEach(function(x){ x.setAttribute('aria-pressed', x === f ? 'true' : 'false'); });
+      applyFilter();
+    });
+  });
+  $('#search').addEventListener('input', applyFilter);
+
+  function applyFilter(){
+    var panel = $('.tab[aria-selected="true"]').dataset.panel;
+    var list = document.getElementById(panel === 'panel-decisions' ? 'list-decisions' : 'list-points');
+    var q = $('#search').value.trim().toLowerCase();
+    var shown = 0;
+    $$('.card', list).forEach(function(card){
+      var okStatus = activeStatus === 'all' || card.dataset.status === activeStatus;
+      var okSearch = !q || (card.dataset.search || '').indexOf(q) !== -1 || card.textContent.toLowerCase().indexOf(q) !== -1;
+      var show = okStatus && okSearch;
+      card.style.display = show ? '' : 'none';
+      if (show) shown++;
+    });
+    var empty = document.getElementById(panel === 'panel-decisions' ? 'empty-decisions' : 'empty-points');
+    empty.hidden = shown !== 0;
+  }
+
+  /* ---------- drawer data ---------- */
+  var data = {
+    d1: {
+      status: 'open', statusLabel: 'Open', kind: 'Verdict', issue: '#2740', title: 'A good-to-merge verdict was filed before the checks finished',
+      sub: 'goodToMerge · Tester Agent B · raised by Demo Builder',
+      amount: '—', amountLabel: 'at stake',
+      reason: 'The checks on this head were still running when the verdict was filed, and one of them failed a minute later.',
+      evidence: 'github.com/zedu/zedu-desktop/pull/740/checks',
+      timeline: [
+        ['done','Verdict filed','Tester Agent B · 2 days ago'],
+        ['done','Dispute opened','Demo Builder · 2 days ago'],
+        ['now','Re-review requested','Tester Agent B · waiting'],
+        ['','Admin decision','Not decided yet']
+      ]
+    },
+    d2: {
+      status: 'review', statusLabel: 'In review', kind: 'Merge decision', issue: '#2732', title: 'The merge accepted a fix that never touched the reported bug',
+      sub: 'accepted · Workspace admin · raised by Demo Lead',
+      amount: '$6.00', amountLabel: 'solver reward',
+      reason: 'The diff only renamed a variable. The share dialog still suggests you as a recipient.',
+      evidence: 'github.com/zedu/zedu-desktop/pull/748/files',
+      timeline: [
+        ['done','Fix accepted','Workspace admin · 3 days ago'],
+        ['done','Dispute opened','Demo Lead · 2 days ago'],
+        ['now','Two agents asked to re-review','2 days ago'],
+        ['','Admin decision','Not decided yet']
+      ]
+    },
+    d3: {
+      status: 'granted', statusLabel: 'Granted', kind: 'Verdict', issue: '#2701', title: 'A “bad” verdict ignored a passing test run on the same head',
+      sub: 'bad · Tester Agent A · raised by Demo Builder',
+      amount: '+$4.00', amountLabel: 'restored', pos: true,
+      reason: 'The reviewer read a stale check from the previous push. The current head was green.',
+      evidence: 'github.com/zedu/zedu-desktop/actions/runs/1189',
+      timeline: [
+        ['done','Verdict filed','Tester Agent A · 4 days ago'],
+        ['done','Dispute opened','Demo Builder · 4 days ago'],
+        ['done','Admin granted the dispute','Workspace admin · 3 days ago'],
+        ['done','Correction written','+$4.00 · 3 days ago']
+      ]
+    },
+    d4: {
+      status: 'rejected', statusLabel: 'Rejected', kind: 'Merge decision', issue: '#2694', title: 'Disputed acceptance of a duplicate report',
+      sub: 'accepted · Workspace admin · raised by Demo Lead',
+      amount: '$1.50', amountLabel: 'reporter award',
+      reason: 'This was the same bug as #2688 and should not have earned a second reporter award.',
+      evidence: 'github.com/zedu/zedu-desktop/issues/2694',
+      timeline: [
+        ['done','Dispute opened','Demo Lead · 6 days ago'],
+        ['done','Admin reviewed both issues','Workspace admin · 5 days ago'],
+        ['done','Rejected: not a duplicate','Workspace admin · 5 days ago']
+      ]
+    },
+    p1: {
+      status: 'open', statusLabel: 'Open', kind: 'Wrong entry', issue: '#2219', title: 'The solver award was credited to the wrong person',
+      sub: 'Solver award · entry #pe_8841',
+      amount: '$4.00', amountLabel: 'disputed',
+      reason: 'I resolved the issue, but the entry sits under another solver’s name.',
+      evidence: 'ziki.dev/zedu/points?entry=pe_8841',
+      timeline: [
+        ['done','Entry written','2 days ago'],
+        ['done','Dispute opened','Demo Builder · 1 day ago'],
+        ['','Admin decision','Not decided yet']
+      ]
+    },
+    p2: {
+      status: 'open', statusLabel: 'Open', kind: 'Missing award', issue: '#1445', title: 'Two reviewers accepted the issue, but no reporter points were written',
+      sub: 'Reporter award · requested role: Reporter',
+      amount: '$1.50', amountLabel: 'missing',
+      reason: 'Both acceptances are on the issue. The ledger has no entry for the reporter.',
+      evidence: 'ziki.dev/zedu/1445',
+      timeline: [
+        ['done','Second acceptance','6 hours ago'],
+        ['done','Dispute opened','Demo Lead · 6 hours ago'],
+        ['','Admin decision','Not decided yet']
+      ]
+    },
+    p3: {
+      status: 'granted', statusLabel: 'Granted', kind: 'Missing award', issue: '#2107', title: 'Missing solver award for a resolved issue',
+      sub: 'Solver award · correction #pe_8902',
+      amount: '+$3.00', amountLabel: 'credited', pos: true,
+      reason: 'The issue was resolved on Tuesday; the award never appeared.',
+      evidence: 'ziki.dev/zedu/2107',
+      timeline: [
+        ['done','Dispute opened','Demo Builder · 3 days ago'],
+        ['done','Admin granted the dispute','Workspace admin · 2 days ago'],
+        ['done','Correction written','+$3.00 · 2 days ago']
+      ]
+    },
+    p4: {
+      status: 'rejected', statusLabel: 'Rejected', kind: 'Wrong entry', issue: '#1998', title: 'The entry already matched the merged work',
+      sub: 'Reporter award · entry #pe_8710',
+      amount: '$1.50', amountLabel: 'disputed',
+      reason: 'The role on the entry looked wrong, but the merge record confirms it.',
+      evidence: 'ziki.dev/zedu/1998',
+      timeline: [
+        ['done','Dispute opened','Demo Lead · 8 days ago'],
+        ['done','Rejected: entry matches merge record','Workspace admin · 7 days ago']
+      ]
+    }
+  };
+
+  var drawer = $('#drawer'), scrim = $('#scrim');
+
+  function openDrawer(id){
+    var d = data[id];
+    if (!d) return;
+    $('#drawerPills').innerHTML =
+      '<span class="pill ' + d.status + '"><span class="led"></span>' + d.statusLabel + '</span>' +
+      '<span class="chip accent">' + d.kind + '</span>' +
+      '<span class="issue-link">' + d.issue + '</span>';
+    $('#drawerTitle').textContent = d.title;
+    $('#drawerSub').textContent = d.sub;
+
+    var timeline = d.timeline.map(function(t){
+      return '<li class="' + t[0] + '"><div class="t">' + t[1] + '</div><div class="d">' + t[2] + '</div></li>';
+    }).join('');
+
+    var admin = (d.status === 'open' || d.status === 'review') ? (
+      '<div class="admin-box">' +
+        '<h4>Admin decision</h4>' +
+        '<p>Granting writes a reversing entry; nothing is deleted. The decider and the outcome are visible to everyone.</p>' +
+        '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
+          '<button class="btn btn-primary btn-sm" type="button" data-toast="Dispute granted. A reversing entry is being written.">Grant</button>' +
+          '<button class="btn btn-ghost btn-sm" type="button" data-toast="Dispute rejected. The ledger stays as it is.">Reject</button>' +
+        '</div>' +
+      '</div>'
+    ) : '';
+
+    $('#drawerBody').innerHTML =
+      '<div class="field"><div class="lab">Amount</div><div class="val" style="font-size:20px;font-weight:800;color:' + (d.pos ? 'var(--ok-fg)' : 'var(--text)') + '">' + d.amount + ' <span style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em">' + d.amountLabel + '</span></div></div>' +
+      '<div class="field"><div class="lab">Reason</div><div class="quote">' + d.reason + '</div></div>' +
+      '<div class="field"><div class="lab">Evidence</div><a class="evidence" href="#" onclick="return false">' +
+        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>' +
+        d.evidence + '</a></div>' +
+      '<div class="field"><div class="lab">Timeline</div><ul class="timeline">' + timeline + '</ul></div>' +
+      admin;
+
+    $('#drawerFoot').innerHTML = (d.status === 'open' || d.status === 'review')
+      ? '<button class="btn btn-ghost btn-sm" type="button" data-toast="Reply added to the dispute thread.">Add a reply</button>' +
+        '<button class="btn btn-ghost btn-sm" type="button" data-toast="Dispute withdrawn.">Withdraw</button>'
+      : '<button class="btn btn-ghost btn-sm" type="button" data-toast="Thread copied.">Copy link to thread</button>';
+
+    drawer.classList.add('on'); drawer.setAttribute('aria-hidden','false');
+    scrim.classList.add('on');
+    $('#drawerClose').focus();
+  }
+
+  function closeDrawer(){
+    drawer.classList.remove('on'); drawer.setAttribute('aria-hidden','true');
+    scrim.classList.remove('on');
+  }
+
+  document.addEventListener('click', function(e){
+    var open = e.target.closest('[data-open]');
+    if (open) { openDrawer(open.dataset.open); return; }
+    var toastBtn = e.target.closest('[data-toast]');
+    if (toastBtn) { showToast(toastBtn.dataset.toast); return; }
+  });
+
+  $('#drawerClose').addEventListener('click', closeDrawer);
+  scrim.addEventListener('click', closeDrawer);
+
+  /* ---------- modal ---------- */
+  var modal = $('#modal');
+  function openModal(){
+    modal.classList.add('on'); modal.setAttribute('aria-hidden','false');
+    setTimeout(function(){ $('#reason').focus(); }, 60);
+  }
+  function closeModal(){
+    modal.classList.remove('on'); modal.setAttribute('aria-hidden','true');
+  }
+  $('#openDispute').addEventListener('click', openModal);
+  $('#modalClose').addEventListener('click', closeModal);
+  $('#modalCancel').addEventListener('click', closeModal);
+  modal.addEventListener('click', function(e){ if (e.target === modal) closeModal(); });
+
+  $$('.seg button').forEach(function(b){
+    b.addEventListener('click', function(){
+      $$('.seg button').forEach(function(x){ x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+      $('#which').innerHTML = b.dataset.kind === 'decision'
+        ? '<option>Tester Agent B · goodToMerge</option><option>Merge review · workspace admin</option><option>Acceptance · 2 reviewers</option>'
+        : '<option>Solver award</option><option>Reporter award</option><option>A ledger entry</option>';
+    });
+  });
+
+  $('#disputeForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    closeModal();
+    showToast('Dispute opened. An admin will review it.');
+  });
+
+  /* ---------- toast ---------- */
+  var toastTimer;
+  function showToast(msg){
+    $('#toastText').textContent = msg;
+    var t = $('#toast');
+    t.classList.add('on');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ t.classList.remove('on'); }, 2600);
+  }
+
+  /* ---------- keyboard ---------- */
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape') { closeDrawer(); closeModal(); }
+  });
+})();
+</script>
 </body>
 </html>

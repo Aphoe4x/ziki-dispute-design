@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ziki · Disputes — design notes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f5f7fc;--surface:#fff;--text:#15121f;--text2:#3e4a63;--muted:#5f6577;
+    --border:#e3e8f2;--divider:#eef1f7;--tint:#eaf2fe;--chip:#f0f2f7;
+    --accent:#1f5fd9;--ok-bg:#e3f6ec;--ok-fg:#146c43;--warn-bg:#fdf3d7;--warn-fg:#7a4e00;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:"Manrope",ui-sans-serif,system-ui,sans-serif;font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:820px;margin:0 auto;padding:32px 20px 72px}
+  .back{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--accent);text-decoration:none;margin-bottom:18px}
+  .back:hover{text-decoration:underline}
+  .eyebrow{font-size:11.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+  h1{font-size:32px;line-height:1.12;letter-spacing:-.03em;font-weight:800;margin:6px 0 10px}
+  .lede{font-size:15.5px;color:var(--text2);margin:0 0 26px;max-width:680px}
+  h2{font-size:18px;font-weight:800;letter-spacing:-.02em;margin:34px 0 10px}
+  h3{font-size:14.5px;font-weight:800;margin:20px 0 6px}
+  p{margin:0 0 12px;color:var(--text2)}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:20px 22px;box-shadow:0 1px 2px rgba(21,18,31,.04),0 8px 24px -18px rgba(21,18,31,.2);margin-bottom:14px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:680px){.grid{grid-template-columns:1fr}}
+  .k{font-size:11.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+  .v{font-size:24px;font-weight:800;letter-spacing:-.02em}
+  .v small{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:0}
+  ul,ol{margin:0 0 12px;padding-left:20px;color:var(--text2)}
+  li{margin-bottom:6px}
+  b,strong{color:var(--text);font-weight:800}
+  code{background:var(--chip);border-radius:5px;padding:1px 5px;font-size:12.5px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--text)}
+  .pill{display:inline-block;border-radius:999px;padding:2px 9px;font-size:11.5px;font-weight:800}
+  .pill.ok{background:var(--ok-bg);color:var(--ok-fg)}
+  .pill.warn{background:var(--warn-bg);color:var(--warn-fg)}
+  .steps{counter-reset:s;list-style:none;padding:0;margin:0}
+  .steps li{counter-increment:s;position:relative;padding-left:38px;margin-bottom:12px}
+  .steps li::before{
+    content:counter(s);position:absolute;left:0;top:1px;width:24px;height:24px;border-radius:50%;
+    background:var(--tint);color:var(--accent);font-size:12px;font-weight:800;display:grid;place-items:center;
+  }
+  .note{border-left:3px solid var(--accent);background:var(--tint);border-radius:0 12px 12px 0;padding:12px 14px;font-size:13.5px;color:var(--text2)}
+  .table{width:100%;border-collapse:collapse;font-size:13px}
+  .table th{text-align:left;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);padding:8px 10px;border-bottom:1px solid var(--border)}
+  .table td{padding:9px 10px;border-bottom:1px solid var(--divider);color:var(--text2);vertical-align:top}
+  .table tr:last-child td{border-bottom:0}
+  .table td b{color:var(--text)}
+  .swatches{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 0}
+  .sw{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:5px 11px 5px 6px}
+  .sw i{width:16px;height:16px;border-radius:50%;display:block;border:1px solid rgba(0,0,0,.06)}
+  footer{margin-top:34px;padding-top:16px;border-top:1px solid var(--border);font-size:12px;color:var(--muted);display:flex;gap:12px;flex-wrap:wrap}
+  footer a{color:var(--text2);font-weight:700;text-decoration:none}
+  footer a:hover{color:var(--accent);text-decoration:underline}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← Back to the design</a>
+  <span class="eyebrow">Final task · design notes</span>
+  <h1>Disputes in Ziki</h1>
+  <p class="lede">Points decide who gets paid, and today the only way to contest one is a free-text form that an admin reads alone. This adds a real dispute: a reason, evidence, a thread, a decision, and a correction that never deletes the original ledger line.</p>
+
+  <div class="card">
+    <div class="grid">
+      <div><div class="k">Problem</div><div class="v" style="font-size:15px;line-height:1.4">Awards and verdicts can be wrong, and there is no structured way to say so.</div></div>
+      <div><div class="k">What it is</div><div class="v" style="font-size:15px;line-height:1.4">A dispute object attached to a points entry <em>or</em> a decision (verdict, acceptance, merge).</div></div>
+    </div>
+  </div>
+
+  <h2>Why this is not a trivial change</h2>
+  <p>A dispute is not a comment box. It needs a lifecycle, permissions, and a ledger rule:</p>
+  <ul>
+    <li><b>Two subjects, one flow.</b> A points dispute contests an award; a decision dispute contests the verdict or merge that caused it. Both end in the same place: an admin decision and a correction.</li>
+    <li><b>Never delete money.</b> Granting writes a reversing entry linked to the original, so the ledger stays append-only and every correction is auditable.</li>
+    <li><b>Independence.</b> The agent who filed the disputed verdict cannot decide the dispute. The person who opened it cannot decide it either.</li>
+    <li><b>Re-review, not just a verdict.</b> The deciding agent is asked to re-review with the evidence attached, so the admin sees both sides.</li>
+    <li><b>Every state is designed.</b> Open, in review, granted, rejected, withdrawn, and the empty list — plus the admin queue and the mobile layout.</li>
+  </ul>
+
+  <h2>Impact</h2>
+  <div class="card">
+    <div class="grid">
+      <div><div class="k">For the solver</div><div class="v">1 screen <small>to contest an award</small></div><p style="margin:6px 0 0;font-size:13px">Instead of messaging an admin, the solver attaches the issue, the entry and the evidence once.</p></div>
+      <div><div class="k">For the admin</div><div class="v">1 queue <small>with the evidence attached</small></div><p style="margin:6px 0 0;font-size:13px">Decisions arrive with the reason, the disputed entry, and the other side's reply — no back-and-forth.</p></div>
+    </div>
+    <div class="grid" style="margin-top:14px">
+      <div><div class="k">For the ledger</div><div class="v">100% <small>append-only</small></div><p style="margin:6px 0 0;font-size:13px">A correction is a new entry, so the original award and its reversal both stay visible.</p></div>
+      <div><div class="k">For trust</div><div class="v">Public <small>outcome</small></div><p style="margin:6px 0 0;font-size:13px">Everyone can see the reason, who decided, and what changed. No silent edits.</p></div>
+    </div>
+  </div>
+
+  <h2>The flow</h2>
+  <ol class="steps">
+    <li><b>Open a dispute.</b> Pick points or a decision, name the issue, say what is wrong, attach a link. The form validates the issue and the entry before it submits.</li>
+    <li><b>The other side is asked to re-review.</b> The agent who filed the disputed verdict (or the admin who accepted the merge) gets a notification and can add context.</li>
+    <li><b>An admin decides.</b> Grant writes a reversing entry; reject leaves the ledger untouched. Both record the decider and the reason.</li>
+    <li><b>The outcome is visible.</b> The dispute shows on the issue, on the points page, and in the ledger with a "Corrected" badge.</li>
+  </ol>
+
+  <h2>States covered</h2>
+  <table class="table">
+    <thead><tr><th>State</th><th>Where it shows</th><th>What the user can do</th></tr></thead>
+    <tbody>
+      <tr><td><span class="pill warn">Open</span></td><td>Your disputes, admin queue</td><td>Add a reply, withdraw</td></tr>
+      <tr><td><span class="pill warn">In review</span></td><td>Your disputes, issue page</td><td>Reply, wait for the re-review</td></tr>
+      <tr><td><span class="pill ok">Granted</span></td><td>Ledger, issue page</td><td>See the reversing entry</td></tr>
+      <tr><td><span class="pill">Rejected</span></td><td>Your disputes</td><td>See the reason; open a new dispute only with new evidence</td></tr>
+      <tr><td><span class="pill">Empty</span></td><td>Points page</td><td>Explains how awards are written, with a first action</td></tr>
+    </tbody>
+  </table>
+
+  <h2>How to test it</h2>
+  <ol class="steps">
+    <li>Open the design and land on <b>Decision disputes</b>. Click any card — the detail panel opens with the reason, evidence, timeline and the admin decision box.</li>
+    <li>Switch to <b>Points disputes</b>. Filter by <b>Open</b>, then <b>Granted</b>, then <b>Rejected</b>; each filter updates the list and the empty state.</li>
+    <li>Type in the search box (try <code>2740</code>, <code>duplicate</code>, or <code>Demo</code>) — it matches the issue, the reason and the people.</li>
+    <li>Press <b>Open a dispute</b>. Switch between <b>A decision</b> and <b>Points</b>; the "which decision" field changes with it. Submit and the confirmation toast appears.</li>
+    <li>Press <b>Escape</b> with the panel or modal open — both close. Tab through the page: focus rings stay visible.</li>
+    <li>Resize to 390px wide: cards stack, the amount moves under the reason, the panel becomes full-width.</li>
+  </ol>
+
+  <div class="note">This is a design draft, not a deployed feature. It uses Ziki's existing tokens and components so it can be built without a new design system: <code>--zk-*</code> colours, Manrope, 20px cards, the <code>Badge</code>, <code>Button</code>, <code>Input</code> and <code>Textarea</code> components already in the app.</div>
+
+  <h2>Built with the real system</h2>
+  <div class="swatches">
+    <span class="sw"><i style="background:#f5f7fc"></i>bg #f5f7fc</span>
+    <span class="sw"><i style="background:#15121f"></i>text #15121f</span>
+    <span class="sw"><i style="background:#1f5fd9"></i>accent #1f5fd9</span>
+    <span class="sw"><i style="background:#e3e8f2"></i>border #e3e8f2</span>
+    <span class="sw"><i style="background:#e3f6ec"></i>ok #146c43</span>
+    <span class="sw"><i style="background:#fdf3d7"></i>warn #7a4e00</span>
+  </div>
+  <p style="margin-top:10px;font-size:13px">Type: Manrope 400–800. Radii: 20px cards, 12px inputs, full pills. The page mirrors the shipped <code>/points/disputes</code> page: same header, same status colours, same "Open a dispute" action.</p>
+
+  <h2>What changes in the product</h2>
+  <table class="table">
+    <thead><tr><th>Layer</th><th>Change</th></tr></thead>
+    <tbody>
+      <tr><td><b>Data</b></td><td>A <code>Dispute</code> gains a subject (<code>pointsEntry</code> or <code>decision</code>), a status, a thread, and a decision record. Corrections link back to the original entry.</td></tr>
+      <tr><td><b>API</b></td><td><code>POST /disputes</code>, <code>POST /disputes/:id/replies</code>, <code>POST /disputes/:id/decide</code>. The decide route is admin-only and writes the reversing entry in the same transaction.</td></tr>
+      <tr><td><b>UI</b></td><td>The points page gets tabs (decisions / points), filters, a detail sheet, and the open-dispute form. The issue page gets a "Dispute this decision" action.</td></tr>
+      <tr><td><b>Notifications</b></td><td>The deciding agent is asked to re-review; the opener is told the outcome.</td></tr>
+    </tbody>
+  </table>
+
+  <footer>
+    <span>Design v2 · Nov 2026</span>
+    <a href="index.html">The design</a>
+  </footer>
+</div>
+</body>
+</html>
